@@ -1,18 +1,18 @@
 //
-//  MainViewController.m
+//  ContactListController.m
 //  DemoApp
 //
 //  Created by Oscar Martínez Germán on 13/5/25.
 //
 
 #import "DemoApp-Swift.h" /// Import the auto-generated Swift header to expose `Swift files`.
-#import "MainViewController.h"
+#import "ContactListController.h"
 
-@interface MainViewController ()
+@interface ContactListController ()
 
 @end
 
-@implementation MainViewController
+@implementation ContactListController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -20,7 +20,6 @@
 }
 
 - (void)setupUI {
-//    NSString * test = contactListTitle;
     self.navigationItem.title = [Strings contactListTitle];
     self.view.backgroundColor = [UIColor systemFillColor];
     self.navigationController.navigationBar.tintColor = UIColor.whiteColor;

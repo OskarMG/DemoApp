@@ -6,7 +6,7 @@
 //
 
 #import "SceneDelegate.h"
-#import "MainViewController.h"
+#import "ContactListController.h"
 
 @interface SceneDelegate ()
 
@@ -27,7 +27,7 @@
 ///
 /// @return A `UINavigationController` with a `MainViewController` instance as its root.
 - (UINavigationController *)setupNavigationController {
-    MainViewController *vc = [[MainViewController alloc] init];
+    ContactListController *vc = [[ContactListController alloc] init];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController: vc];
     navController.navigationBar.titleTextAttributes = @{
         NSForegroundColorAttributeName: [UIColor whiteColor]
