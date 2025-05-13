@@ -13,8 +13,8 @@ public class BarButton: NSObject {
     @MainActor public static func create(
         title: String,
         style: UIBarButtonItem.Style = .plain,
-        target: Any?,
-        action: Selector?
+        target: Any? = nil,
+        action: Selector? = nil
     ) -> UIBarButtonItem {
         return UIBarButtonItem(title: title, style: style, target: target, action: action)
     }

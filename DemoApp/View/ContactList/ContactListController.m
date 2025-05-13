@@ -21,7 +21,7 @@
 
 @implementation ContactListController
 
-    static NSString *cellIdentifier = @"ContactCell";
+static NSString *cellIdentifier = @"ContactCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -38,10 +38,15 @@
 // MARK: - UI SETUP METHODS
 
 - (void)setupUI {
+    self.view.backgroundColor = UIColor.systemFillColor;
     self.navigationItem.hidesSearchBarWhenScrolling = NO;
     self.navigationItem.title = [Strings contactListTitle];
-    self.view.backgroundColor = UIColor.systemFillColor;
-    self.navigationController.navigationBar.tintColor = UIColor.whiteColor;
+    self.navigationItem.backBarButtonItem = [BarButton
+        createWithTitle:@"" style:UIBarButtonItemStylePlain
+        target:self
+        action:@selector(onAddButtonTap)
+    ];
+    
     [self setupSearchController];
     [self setupTableView];
     [self setupAddButton];
@@ -61,10 +66,9 @@
     self.tableView = [[UITableView alloc] initWithFrame: self.view.bounds style: UITableViewStylePlain];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier: cellIdentifier];
-    self.tableView.translatesAutoresizingMaskIntoConstraints = false;
-    
     self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier: cellIdentifier];
+    
     [self.view addSubview:self.tableView];
     
     /// Set `Constraints`
@@ -79,23 +83,30 @@
 -(void)setupAddButton {
     UIBarButtonItem * add = [
         BarButton
-            createWithTitle:[Strings addButtonTitle] style:UIBarButtonItemStylePlain
-            target:self
-            action:@selector(onAddButtonTap)
+        createWithTitle:[Strings addButtonTitle] style:UIBarButtonItemStylePlain
+        target:self
+        action:@selector(onAddButtonTap)
     ];
     UIBarButtonItem * edit = [
         BarButton
-            createWithTitle:[Strings editButtonTitle] style:UIBarButtonItemStylePlain
-            target:self
-            action:@selector(onAddButtonTap)
+        createWithTitle:[Strings editButtonTitle] style:UIBarButtonItemStylePlain
+        target:self
+        action:@selector(onEditButtonTap)
     ];
-
+    
     add.tintColor = UIColor.systemBlueColor;
     edit.tintColor = UIColor.systemBlueColor;
     self.navigationItem.rightBarButtonItems = @[add, edit];
 }
 
 - (void)onAddButtonTap {
+    CreateContactViewController *createVC = [[CreateContactViewController alloc] init];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.navigationController pushViewController:createVC animated:YES];
+    });
+}
+
+- (void)onEditButtonTap {
     NSLog(@"KLK");
 }
 
@@ -121,7 +132,6 @@
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[cd] %@", searchText];
         self.listToBeDisplayed = [self.originalContactList filteredArrayUsingPredicate:predicate];
     }
-
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
     });

@@ -10,6 +10,8 @@ import Foundation
 @objc public final class Strings: NSObject {
     @objc public static let addButtonTitle = "Add"
     @objc public static let editButtonTitle = "Edit"
+    @objc public static let cancelButtonTitle = "Cancel"
     @objc public static let contactListTitle = "Contact List"
+    @objc public static let createContactTitle = "Add Contact"
     @objc public static let searchBarPlaceholder = "Search Contacts"
 }
