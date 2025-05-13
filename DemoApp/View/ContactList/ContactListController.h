@@ -7,7 +7,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ContactListController : UIViewController
+@interface ContactListController: UIViewController  <UITableViewDataSource, UITableViewDelegate>
 
 
 @end

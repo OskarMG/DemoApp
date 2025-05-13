@@ -29,9 +29,6 @@
 - (UINavigationController *)setupNavigationController {
     ContactListController *vc = [[ContactListController alloc] init];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController: vc];
-    navController.navigationBar.titleTextAttributes = @{
-        NSForegroundColorAttributeName: [UIColor whiteColor]
-    };
     return navController;
 }
 
