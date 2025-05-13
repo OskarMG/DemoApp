@@ -18,20 +18,20 @@
 
 ## 📦 Requirements
 
-- 💻 Xcode **15** or later  
-- 📱 iOS **15.0+**  
-- 🦅 Swift **5**  
-- 🔤 Objective-C  
+- 💻 Xcode **16** or later  
+- 📱 iOS **18.0+**  
+- 🦅 Swift **6**  
+- 🔤 Objective-C 
 
 ---
 
 ## ⚙️ Setup
 
 1. 📥 Clone the repository:
-    git clone https://github.com/your-username/DemoApp.git
+    git clone https://github.com/OskarMG/DemoApp
 2. 📂 Open the project in Xcode:
     Navigate to the project folder and open the DemoApp.xcodeproj file using Xcode.
 3. ▶️ Build and run the app on a simulator or physical device:
     In Xcode, select a target device or simulator and click the "Run" button (or press Cmd + R) to build and run the app.
 4. ⚠️ REMEMBER ⚠️
-    Remember to replace the bundle identifier for one that fits your team, example: com.{accountName}.DemoApp
+    Don't forget to replace the bundle identifier for one that fits your team, example: com.{accountName}.DemoApp
