@@ -6,7 +6,7 @@
 //
 
 #import "SceneDelegate.h"
-#import "ViewController.h"
+#import "MainViewController.h"
 
 @interface SceneDelegate ()
 
@@ -23,11 +23,11 @@
     [self.window makeKeyAndVisible];
 }
 
-/// Creates and returns a navigation controller with `ViewController` as its root.
+/// Creates and returns a navigation controller with `ViewController` subclass as its root.
 ///
-/// @return A `UINavigationController` with a `ViewController` instance as its root.
+/// @return A `UINavigationController` with a `MainViewController` instance as its root.
 - (UINavigationController *)setupNavigationController {
-    ViewController *vc = [[ViewController alloc] init];
+    MainViewController *vc = [[MainViewController alloc] init];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController: vc];
     navController.navigationBar.titleTextAttributes = @{
         NSForegroundColorAttributeName: [UIColor whiteColor]

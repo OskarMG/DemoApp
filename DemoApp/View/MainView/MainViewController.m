@@ -1,17 +1,17 @@
 //
-//  ViewController.m
+//  MainViewController.m
 //  DemoApp
 //
 //  Created by Oscar Martínez Germán on 13/5/25.
 //
 
-#import "ViewController.h"
+#import "MainViewController.h"
 
-@interface ViewController ()
+@interface MainViewController ()
 
 @end
 
-@implementation ViewController
+@implementation MainViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
