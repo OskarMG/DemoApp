@@ -15,7 +15,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    [self setupUI];
+}
+
+- (void)setupUI {
+    self.navigationItem.title = @"DemoApp";
+    self.view.backgroundColor = [UIColor systemFillColor];
+    self.navigationController.navigationBar.tintColor = UIColor.whiteColor;
 }
 
 
