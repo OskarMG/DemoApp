@@ -31,6 +31,12 @@ public struct NetworkService: @unchecked Sendable {
             config.timeoutIntervalForRequest = 130
             let session = URLSession(configuration: config)
             let (data, response) = try await session.data(for: urlRequest)
+            
+            #if DEBUG
+            debugPrint("----------------------")
+            debugPrint("@Request URL: \(urlRequest.url?.absoluteString ?? "NOT FOUND")")
+            debugPrint("----------------------\n")
+            #endif
 
             guard let httpResponse = response as? HTTPURLResponse else {
                 #if DEBUG

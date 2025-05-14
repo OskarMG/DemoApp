@@ -37,7 +37,8 @@ public final class CreateContactAPIRepository: CreateContactAPIRepositoring {
     
     func getPictureCollection() async throws(NetworkServiceError) -> PictureResponse {
         do throws(NetworkServiceError) {
-            let endPoint = CreateContactEndPoint.getPictureCollection(page: 1, limit: 100)
+            let page = Int.random(in: 9..<20)
+            let endPoint = CreateContactEndPoint.getPictureCollection(page: page, limit: 50)
             let response = try await networkService.request(
                 endPoint,
                 as: PictureResponse.self
