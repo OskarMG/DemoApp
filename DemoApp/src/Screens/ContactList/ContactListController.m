@@ -5,23 +5,25 @@
 //  Created by Oscar Martínez Germán on 13/5/25.
 //
 
-#import "DemoApp-Swift.h" /// Import the auto-generated Swift header to expose `Swift files`.
+#import "DemoApp-Swift.h" /// Import the Swift header to expose `Swift files`.
 #import "ContactListController.h"
 
-@interface ContactListController () <UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating>
+@interface ContactListController () <UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating, ContactDelegate>
     /// `UI` Elements
     @property (nonatomic, strong) UITableView *tableView;
     @property (nonatomic, strong) UISearchController *searchController;
     
     /// `Properties`
     @property (nonatomic, assign) BOOL isFiltering;
-    @property (nonatomic, strong) NSArray<NSString *> *listToBeDisplayed;
-    @property (nonatomic, strong) NSArray<NSString *> *originalContactList;
+    @property (nonatomic, strong) NSMutableArray<NSString *> *listToBeDisplayed;
+    @property (nonatomic, strong) NSMutableArray<NSString *> *originalContactList;
 @end
 
 @implementation ContactListController
 
 static NSString *cellIdentifier = @"ContactCell";
+/// For Testing Purpose Only
+static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -31,7 +33,7 @@ static NSString *cellIdentifier = @"ContactCell";
 
 - (void)setContact {
     /// Initial default values for `UI PURPOSE ONLY`
-    self.originalContactList = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
+    self.originalContactList = [defaultValues mutableCopy];
     self.listToBeDisplayed = self.originalContactList;
 }
 
@@ -87,27 +89,17 @@ static NSString *cellIdentifier = @"ContactCell";
         target:self
         action:@selector(onAddButtonTap)
     ];
-    UIBarButtonItem * edit = [
-        BarButton
-        createWithTitle:[Strings editButtonTitle] style:UIBarButtonItemStylePlain
-        target:self
-        action:@selector(onEditButtonTap)
-    ];
-    
     add.tintColor = UIColor.systemBlueColor;
-    edit.tintColor = UIColor.systemBlueColor;
-    self.navigationItem.rightBarButtonItems = @[add, edit];
+    self.editButtonItem.tintColor = UIColor.systemBlueColor;
+    self.navigationItem.rightBarButtonItems = @[add, self.editButtonItem];
 }
 
 - (void)onAddButtonTap {
-    CreateContactViewController *createVC = [[CreateContactViewController alloc] init];
+    id<ContactDelegate> delegate = self;
+    CreateContactViewController *createVC = [[CreateContactViewController alloc] initWithContactDelegate:delegate];    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.navigationController pushViewController:createVC animated:YES];
     });
-}
-
-- (void)onEditButtonTap {
-    NSLog(@"KLK");
 }
 
 // MARK: - UITableViewDataSource METHODS
@@ -122,6 +114,27 @@ static NSString *cellIdentifier = @"ContactCell";
     return cell;
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    [self.tableView setEditing:editing animated:animated];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [self.originalContactList removeObjectAtIndex:indexPath.row];
+
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.tableView reloadData];
+        });
+    }
+}
+
 // MARK: - UISearchResultsUpdating
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
@@ -130,12 +143,22 @@ static NSString *cellIdentifier = @"ContactCell";
         self.listToBeDisplayed = self.originalContactList;
     } else {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[cd] %@", searchText];
-        self.listToBeDisplayed = [self.originalContactList filteredArrayUsingPredicate:predicate];
+        self.listToBeDisplayed = [[self.originalContactList filteredArrayUsingPredicate:predicate] mutableCopy];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
     });
 }
 
+- (void)didSaveWithContact:(ContactObjC * _Nonnull)contact {
+    if (!self.originalContactList) {
+        self.originalContactList = [NSMutableArray array];
+    }
+
+    [self.originalContactList addObject:contact.name];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView reloadData];
+    });
+}
 
 @end

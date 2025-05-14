@@ -17,6 +17,8 @@ final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
     @Published var photoCollection: PictureResponse = []
     
     private let repository: CreateContactAPIRepositoring
+    private weak var contactDelegate: ContactDelegate?
+    private weak var wrapperDelegate: CreateContactWrapperDelegate?
     
     var canSaveContact: Bool {
         name.isNotEmptyOrWhitespace &&
@@ -25,9 +27,13 @@ final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
     }
     
     init(
+        contactDelegate: ContactDelegate?,
+        wrapperDelegate: CreateContactWrapperDelegate?,
         repository: CreateContactAPIRepositoring = CreateContactAPIRepository()
     ) {
         self.repository = repository
+        self.contactDelegate = contactDelegate
+        self.wrapperDelegate = wrapperDelegate
     }
     
     private func showGallery() {
@@ -45,8 +51,12 @@ final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
 
     func onSaveContact() {
         dismissKeyboard()
-        let _ = Contact(name: name, lastName: lastName, phone: phone)
-        // TODO: PASS DATA TO THE LIST
+        contactDelegate?.didSave(contact: .init(
+            name: name,
+            lastName: lastName,
+            phone: phone)
+        )
+        wrapperDelegate?.didDismiss()
     }
     
     func dismissKeyboard() {
@@ -76,5 +86,4 @@ final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
             }
         }
     }
-
 }
