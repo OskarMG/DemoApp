@@ -19,7 +19,7 @@ struct CreateContactView<ViewModel>: View where ViewModel: CreateContactViewMode
             VStack(spacing: .padding16) {
                 Button(action: viewModel.onEditProfilePicture) {
                     ProfileView(
-                        url: viewModel.selectedAvatar,
+                        url: viewModel.selectedAvatar?.url,
                         width: .profileWidth,
                         height: .profileHeight
                     )
@@ -42,6 +42,15 @@ struct CreateContactView<ViewModel>: View where ViewModel: CreateContactViewMode
         .onTapGesture(perform: viewModel.dismissKeyboard)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.clear)
+        .onAppear(perform: viewModel.onViewAppear)
+        .sheet(isPresented: $viewModel.isGalleryVisible) {
+            PhotoCollectionView(
+                didSelect: viewModel.didSelect(photo:),
+                collection: viewModel.photoCollection
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
     }
     
     private var saveButton: some View {

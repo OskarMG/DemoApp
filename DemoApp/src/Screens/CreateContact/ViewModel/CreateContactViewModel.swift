@@ -12,8 +12,9 @@ final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
     @Published var name: String = ""
     @Published var lastName: String = ""
     @Published var phone: String = ""
-    @Published var selectedAvatar: String?
+    @Published var selectedAvatar: Picture?
     @Published var isGalleryVisible: Bool = false
+    @Published var photoCollection: PictureResponse = []
     
     private let repository: CreateContactAPIRepositoring
     
@@ -29,11 +30,23 @@ final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
         self.repository = repository
     }
     
+    private func showGallery() {
+        isGalleryVisible = true
+    }
+    
     /// `Events`
+    @MainActor
+    func onViewAppear() { getCollection() }
+    
+    func didSelect(photo: Picture) {
+        selectedAvatar = photo
+        isGalleryVisible = false
+    }
+
     func onSaveContact() {
         dismissKeyboard()
-        let newContact = Contact(name: name, lastName: lastName, phone: phone)
-        print("newContact: \(newContact)")
+        let _ = Contact(name: name, lastName: lastName, phone: phone)
+        // TODO: PASS DATA TO THE LIST
     }
     
     func dismissKeyboard() {
@@ -45,7 +58,23 @@ final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
     @MainActor
     func onEditProfilePicture() {
         dismissKeyboard()
-        print("onEditProfilePicture")
+        showGallery()
+        guard photoCollection.isEmpty else { return }
+        getCollection()
+    }
+    
+    @MainActor
+    private func getCollection() {
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let collection = try await self.repository.getPictureCollection()
+                self.photoCollection = collection
+            } catch {
+                /// Handle Error || Ask UX Team
+                /// `debugPrint("@Error: \(error)")
+            }
+        }
     }
 
 }

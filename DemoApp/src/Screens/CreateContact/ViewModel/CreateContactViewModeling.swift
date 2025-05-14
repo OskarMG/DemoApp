@@ -12,10 +12,13 @@ protocol CreateContactViewModeling: AnyObject, ObservableObject {
     var lastName: String { get set}
     var phone: String { get set}
     var canSaveContact: Bool { get }
-    var selectedAvatar: String? { get }
+    var selectedAvatar: Picture? { get }
     var isGalleryVisible: Bool { get set }
+    var photoCollection: PictureResponse { get }
     /// `Methods`
+    func onViewAppear()
     func onSaveContact()
     func dismissKeyboard()
     func onEditProfilePicture()
+    func didSelect(photo: Picture)
 }
