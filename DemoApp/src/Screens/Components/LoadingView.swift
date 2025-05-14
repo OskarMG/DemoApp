@@ -59,9 +59,9 @@ struct LoadingView: View {
                 .frame(width: size.frame, height: size.frame)
                 .scaleEffect(size.scale)
                 .padding()
-                .background(Color(tint).opacity(.opacity1))
+                .background(Color(tint).opacity(.opacity01))
                 .clipShape(Circle())
-                .shadow(color: tint.opacity(.opacity3), radius: .radiusX, x: .zero, y: .radiusY)
+                .shadow(color: tint.opacity(.opacity03), radius: .radiusX, x: .zero, y: .radiusY)
 
             if let title {
                 Text(title)
@@ -75,8 +75,8 @@ struct LoadingView: View {
 // MARK: - Constants
 
 private extension Double {
-    static let opacity1: Double = 0.1
-    static let opacity3: Double = 0.3
+    static let opacity01: Double = 0.1
+    static let opacity03: Double = 0.3
 }
 
 private extension CGFloat {
