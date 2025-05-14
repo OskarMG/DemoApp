@@ -15,15 +15,13 @@
     
     /// `Properties`
     @property (nonatomic, assign) BOOL isFiltering;
-    @property (nonatomic, strong) NSMutableArray<NSString *> *listToBeDisplayed;
-    @property (nonatomic, strong) NSMutableArray<NSString *> *originalContactList;
+    @property (nonatomic, strong) NSMutableArray<ContactObjC *> *listToBeDisplayed;
+    @property (nonatomic, strong) NSMutableArray<ContactObjC *> *originalContactList;
 @end
 
 @implementation ContactListController
 
 static NSString *cellIdentifier = @"ContactCell";
-/// For Testing Purpose Only
-static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -33,15 +31,15 @@ static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
 
 - (void)setContact {
     /// Initial default values for `UI PURPOSE ONLY`
-    self.originalContactList = [defaultValues mutableCopy];
-    self.listToBeDisplayed = self.originalContactList;
+    _originalContactList = [[ContactObjC defaultValues] mutableCopy];
+    _listToBeDisplayed = _originalContactList;
 }
 
 // MARK: - UI SETUP METHODS
 
 - (void)setupUI {
     self.view.backgroundColor = UIColor.systemFillColor;
-    self.navigationItem.hidesSearchBarWhenScrolling = NO;
+    self.navigationItem.hidesSearchBarWhenScrolling = FALSE;
     self.navigationItem.title = [Strings contactListTitle];
     self.navigationItem.backBarButtonItem = [BarButton
         createWithTitle:@"" style:UIBarButtonItemStylePlain
@@ -55,30 +53,30 @@ static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
 }
 
 - (void)setupSearchController {
-    self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
-    self.searchController.searchResultsUpdater = self;
-    self.searchController.obscuresBackgroundDuringPresentation = NO;
-    self.searchController.searchBar.placeholder = [Strings searchBarPlaceholder];
-    self.definesPresentationContext = YES;
+    _searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
+    _searchController.searchResultsUpdater = self;
+    _searchController.obscuresBackgroundDuringPresentation = FALSE;
+    _searchController.searchBar.placeholder = [Strings searchBarPlaceholder];
+    self.definesPresentationContext = TRUE;
     self.navigationItem.searchController = self.searchController;
-    self.searchController.searchBar.tintColor = UIColor.systemBlueColor;
+    _searchController.searchBar.tintColor = UIColor.systemBlueColor;
 }
 
 -(void)setupTableView {
-    self.tableView = [[UITableView alloc] initWithFrame: self.view.bounds style: UITableViewStylePlain];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier: cellIdentifier];
+    _tableView = [[UITableView alloc] initWithFrame: self.view.bounds style: UITableViewStylePlain];
+    _tableView.delegate = self;
+    _tableView.dataSource = self;
+    _tableView.translatesAutoresizingMaskIntoConstraints = FALSE;
+    [_tableView registerClass:UITableViewCell.class forCellReuseIdentifier: cellIdentifier];
     
     [self.view addSubview:self.tableView];
     
     /// Set `Constraints`
     [NSLayoutConstraint activateConstraints:@[
-        [self.tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-        [self.tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-        [self.tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [self.tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [_tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [_tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+        [_tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [_tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
     ]];
 }
 
@@ -98,7 +96,7 @@ static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
     id<ContactDelegate> delegate = self;
     CreateContactViewController *createVC = [[CreateContactViewController alloc] initWithContactDelegate:delegate];    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.navigationController pushViewController:createVC animated:YES];
+        [self.navigationController pushViewController:createVC animated:TRUE];
     });
 }
 
@@ -110,28 +108,34 @@ static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: cellIdentifier];
-    cell.textLabel.text = self.listToBeDisplayed[indexPath.row];
+    ContactObjC *contact = _listToBeDisplayed[indexPath.row];
+    cell.textLabel.text = contact.name;
+    cell.detailTextLabel.text = contact.phone;
     return cell;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    return TRUE;
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
-    [self.tableView setEditing:editing animated:animated];
+    [_tableView setEditing:editing animated:animated];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [self.originalContactList removeObjectAtIndex:indexPath.row];
+        ContactObjC *contactToBeRemoved = _listToBeDisplayed[indexPath.row];
+        [_listToBeDisplayed removeObjectAtIndex:indexPath.row];
+        [_originalContactList removeObject:contactToBeRemoved];
 
+        /// Update the table view
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.tableView reloadData];
-        });
+
+        /// Reapply search filtering (if necessary)
+        if (self.searchController.searchBar.text.length > 0) {
+            [self updateSearchResultsForSearchController:self.searchController];
+        }
     }
 }
 
@@ -140,10 +144,10 @@ static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     NSString *searchText = searchController.searchBar.text;
     if (searchText.length == 0) {
-        self.listToBeDisplayed = self.originalContactList;
+        _listToBeDisplayed = _originalContactList;
     } else {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF CONTAINS[cd] %@", searchText];
-        self.listToBeDisplayed = [[self.originalContactList filteredArrayUsingPredicate:predicate] mutableCopy];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name CONTAINS[cd] %@", searchText];
+        _listToBeDisplayed = [[_originalContactList filteredArrayUsingPredicate:predicate] mutableCopy];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
@@ -151,11 +155,12 @@ static NSArray *defaultValues = @[@"Oscar", @"Lynn", @"Zabdi", @"Monica"];
 }
 
 - (void)didSaveWithContact:(ContactObjC * _Nonnull)contact {
-    if (!self.originalContactList) {
-        self.originalContactList = [NSMutableArray array];
+    if (!_originalContactList) {
+        _originalContactList = [NSMutableArray array];
     }
 
-    [self.originalContactList addObject:contact.name];
+    [_originalContactList addObject:contact];
+    _listToBeDisplayed = _originalContactList;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
     });

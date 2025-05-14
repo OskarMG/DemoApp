@@ -23,4 +23,10 @@ class ContactObjC: NSObject {
         self.lastName = lastName
         self.phone = phone
     }
+    
+    @objc nonisolated(unsafe) static let defaultValues: [ContactObjC] = [
+        .init(name: "Oscar", lastName: "Martínez", phone: "8092050922"),
+        .init(name: "Lynn", lastName: "Laia", phone: "8295914062"),
+        .init(name: "Zabdi", lastName: "Gil", phone: "8095931167")
+    ]
 }
