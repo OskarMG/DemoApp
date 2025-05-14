@@ -8,13 +8,14 @@
 import Foundation
 import UIKit.UIResponder
 
-final class CreateContactViewModel: CreateContactViewModeling {
-    
+final class CreateContactViewModel: @preconcurrency CreateContactViewModeling {
     @Published var name: String = ""
     @Published var lastName: String = ""
     @Published var phone: String = ""
     @Published var selectedAvatar: String?
     @Published var isGalleryVisible: Bool = false
+    
+    private let repository: CreateContactAPIRepositoring
     
     var canSaveContact: Bool {
         name.isNotEmptyOrWhitespace &&
@@ -22,12 +23,13 @@ final class CreateContactViewModel: CreateContactViewModeling {
         phone.isNotEmptyOrWhitespace
     }
     
-    /// `Events`
-    func onEditProfilePicture() {
-        dismissKeyboard()
-        print("onEditProfilePicture")
+    init(
+        repository: CreateContactAPIRepositoring = CreateContactAPIRepository()
+    ) {
+        self.repository = repository
     }
     
+    /// `Events`
     func onSaveContact() {
         dismissKeyboard()
         let newContact = Contact(name: name, lastName: lastName, phone: phone)
@@ -40,4 +42,10 @@ final class CreateContactViewModel: CreateContactViewModeling {
         }
     }
     
+    @MainActor
+    func onEditProfilePicture() {
+        dismissKeyboard()
+        print("onEditProfilePicture")
+    }
+
 }
