@@ -9,7 +9,6 @@ import UIKit
 import SwiftUI
 
 @objc class CreateContactViewController: UIViewController {
-    let child = UIHostingController(rootView: CreateContactView())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +28,9 @@ import SwiftUI
     
     /// Setup SwiftUI View
     private func setupSwiftUIView() {
+        let viewModel = CreateContactViewModel()
+        let child = UIHostingController(rootView: CreateContactView(viewModel: viewModel))
+        
         addChild(child)
         child.view.frame = view.bounds
         view.addSubview(child.view)
